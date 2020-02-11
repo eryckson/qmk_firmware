@@ -18,23 +18,50 @@
 // begin encoder handler: https://www.reddit.com/r/olkb/comments/9jzbg1/help_with_rotary_encoder_code/e8elobo/
 
 // wait DELAY ms before unregistering media keys
-#define MEDIA_KEY_DELAY 10
+#define MEDIA_KEY_DELAY 15
 
 // ref:
 void encoder_update_user(uint8_t index, bool clockwise) {
   uint16_t held_keycode_timer = timer_read();
-  if (clockwise) {
-    register_code(KC_VOLU);
-    while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) {
-      // no-op
-    }
-    unregister_code(KC_VOLU);
-  } else {
-    register_code(KC_VOLD);
-    while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) {
-      // no-op
-    }
-    unregister_code(KC_VOLD);
+
+  switch(biton32(layer_state)){
+    case 2:
+      if (clockwise) {
+        register_code(KC_MNXT);
+        while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) {
+          // no-op
+        }
+        unregister_code(KC_MNXT);
+      } else {
+        register_code(KC_MPRV);
+        while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) {
+          // no-op
+        }
+        unregister_code(KC_MPRV);
+      }
+      break;
+    case 1:
+      if (clockwise) {
+        tap_code(KC_WH_D);
+      } else {
+        tap_code(KC_WH_U);
+      }
+      break;
+    default:
+      if (clockwise) {
+        register_code(KC_VOLU);
+        while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) {
+          // no-op
+        }
+        unregister_code(KC_VOLU);
+      } else {
+        register_code(KC_VOLD);
+        while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) {
+          // no-op
+        }
+        unregister_code(KC_VOLD);
+      }
+      break;
   }
 }
 
@@ -74,36 +101,36 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-----------------------------------------------------------------------------------.
  * |   ~  |   !  |   @  |   #  |   $  |   %  |   ^  |   &  |   *  |   (  |   )  | Bksp |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * | Del  |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |   _  |   +  |     |    \  |  |   |
+ * | Del  | All  | Save |      | Find |      |      |   _  |   +  |  {   |   }  |  |   |
  * |------+------+------+------+------+------|------+------+------+------+------+------|
- * |      |  F7  |  F8  |  F9  |  F10 |  F11 |  F12 |ISO ~ |ISO | |      |      |Enter |
+ * |      | Undo | Cut  | Copy |Paste |      |      |      |      |      |      |Enter |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |             |      | Next | Vol- | Vol+ | Play |
+ * | Mute |      |      |      |      |             |      | Home | PgDn | PgUp | End  |
  * `-----------------------------------------------------------------------------------'
  */
 [_LOWER] = LAYOUT_ortho_4x12( \
-  KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_BSPC, \
-  KC_DEL,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE, \
-  _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  BL_TOGG, BL_INC , BL_DEC , _______, _______, \
-  _______, _______, _______, _______, _______, _______, _______, _______, KC_MNXT, KC_VOLD, KC_VOLU, KC_MPLY \
+  KC_TILD, KC_EXLM,         KC_AT,    KC_HASH, KC_DLR,     KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_BSPC, \
+  KC_DEL,  LCTL(KC_A), LCTL(KC_S),    _______, LCTL(KC_F), _______, _______, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE, \
+  _______, LCTL(KC_Z), LCTL(KC_X), LCTL(KC_C), LCTL(KC_V), _______, _______, _______, _______, _______, _______, _______, \
+  KC_MUTE,    _______,    _______,    _______,    _______, _______, _______, _______, KC_HOME, KC_PGUP, KC_PGDOWN, KC_END \
 ),
 
 /* Raise
  * ,-----------------------------------------------------------------------------------.
  * |   `  |   1  |   2  |   3  |   4  |   5  |   6  |   7  |   8  |   9  |   0  | Bksp |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * | Del  |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |   -  |   =  |   [  |   ]  |  \   |
+ * | Caps |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |   -  |   =  |   [  |   ]  |  \   |
  * |------+------+------+------+------+------|------+------+------+------+------+------|
- * |      |  F7  |  F8  |  F9  |  F10 |  F11 |  F12 |ISO # |ISO / |      |      |Enter |
+ * |      |  F7  |  F8  |  F9  |  F10 |  F11 |  F12 |      |      |      |      |Enter |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |             |      | Next | Vol- | Vol+ | Play |
+ * | Mute |      |      |      |      |             |      | Prev | Vol- | Vol+ | Next |
  * `-----------------------------------------------------------------------------------'
  */
 [_RAISE] = LAYOUT_ortho_4x12( \
   KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC, \
-  KC_DEL,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC, KC_BSLS, \
-  _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_NUHS, KC_NUBS, _______, _______, _______, \
-  _______, _______, _______, _______, _______, _______, _______, _______, KC_MNXT, KC_VOLD, KC_VOLU, KC_MPLY \
+  KC_CAPS, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC, KC_BSLS, \
+  _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, _______, _______, _______, _______, \
+  KC_MUTE, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT \
 ),
 
 /* Adjust (Lower + Raise)
