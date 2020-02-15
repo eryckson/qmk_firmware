@@ -42,9 +42,17 @@ void encoder_update_user(uint8_t index, bool clockwise) {
       break;
     case 1:
       if (clockwise) {
-        tap_code(KC_WH_D);
+        register_code(KC_BRIU);
+        while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) {
+          // no-op
+        }
+        unregister_code(KC_BRIU);
       } else {
-        tap_code(KC_WH_U);
+        register_code(KC_BRID);
+        while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) {
+          // no-op
+        }
+        unregister_code(KC_BRID);
       }
       break;
     default:
